@@ -8,7 +8,7 @@ export class Task {
 	@Field()
 	name: string;
 	@Field()
-	dueDate: string;
+	dueDate: Date;
 	@Field()
 	status: Status;
 	@Field({ nullable: true })

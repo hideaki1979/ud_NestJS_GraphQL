@@ -37,7 +37,10 @@ export class TaskResolver {
 
 	@Mutation(() => TaskModel)
 	@UseGuards(JwtAuthGuard)
-	async deleteTask(@Args('id', { type: () => Int }) id: number): Promise<Task> {
-		return await this.taskService.deleteTask(id);
+	async deleteTask(
+		@Args('id', { type: () => Int }) id: number,
+		@Args('userId', { type: () => Int }) userId: number,
+	): Promise<Task> {
+		return await this.taskService.deleteTask(id, userId);
 	}
 }

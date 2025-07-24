@@ -10,7 +10,10 @@ export class UserService {
 
 	async createUser(createUserInput: CreateUserInput): Promise<User> {
 		const { name, email, password } = createUserInput;
-		const hashedPassword = await bcrypt.hash(password, 10);
+		const saltRounds = process.env.BCRYPT_SALT_ROUNDS
+			? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
+			: 10;
+		const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 		return await this.prismaService.user.create({
 			data: {

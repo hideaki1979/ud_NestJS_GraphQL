@@ -11,7 +11,7 @@ datasource db {
 model Task {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
-  dueDate     String   @db.VarChar(10)
+  dueDate     DateTime @db.Date
   status      Status   @default(NOT_STARTED)
   description String?
   createdAt   DateTime @default(now()) @db.Timestamp(0)
