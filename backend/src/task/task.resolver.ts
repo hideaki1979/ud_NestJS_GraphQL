@@ -1,22 +1,27 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { TaskService } from './task.service';
 import { Task as TaskModel } from './models/task.model';
 import { CreateTaskInput } from './dto/createTask.input';
-import { Task } from 'generated/prisma';
+import { Task, User } from 'generated/prisma';
 import { UpdateTaskInput } from './dto/updateTask.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+// GraphQLコンテキストの型定義
+interface GraphQLContext {
+	req: {
+		user: User;
+	};
+}
 @Resolver()
 export class TaskResolver {
 	constructor(private readonly taskService: TaskService) {}
 
 	@Query(() => [TaskModel], { nullable: 'items' })
 	@UseGuards(JwtAuthGuard)
-	async getTasks(
-		@Args('userId', { type: () => Int }) userId: number,
-	): Promise<Task[]> {
-		return await this.taskService.getTasks(userId);
+	async getTasks(@Context() context: GraphQLContext): Promise<Task[]> {
+		const createUser: User = context.req.user;
+		return await this.taskService.getTasks(createUser.id);
 	}
 
 	@Mutation(() => TaskModel)

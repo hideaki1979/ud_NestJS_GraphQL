@@ -1,8 +1,16 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+	Injectable,
+	Logger,
+	OnModuleInit,
+	OnApplicationShutdown,
+} from '@nestjs/common';
 import { PrismaClient } from '../../generated/prisma';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService
+	extends PrismaClient
+	implements OnModuleInit, OnApplicationShutdown
+{
 	private readonly logger = new Logger(PrismaService.name);
 	async onModuleInit() {
 		try {
@@ -12,5 +20,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 			this.logger.error('データベース接続に失敗しました', error);
 			throw error;
 		}
+	}
+
+	async onApplicationShutdown() {
+		await this.$disconnect();
 	}
 }

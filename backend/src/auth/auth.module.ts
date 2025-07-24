@@ -6,14 +6,27 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
 	imports: [
 		UserModule,
 		PassportModule.register({ defaultStrategy: 'jwt' }),
-		JwtModule.register({
-			secret: process.env.JWT_SECRET,
-			signOptions: { expiresIn: '1h' },
+		ConfigModule.forRoot(),
+		JwtModule.registerAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => {
+				const secret = configService.get<string>('JWT_SECRET');
+				if (!secret) {
+					throw new Error('JWT_SECRETの環境変数が設定されてません');
+				}
+
+				return {
+					secret,
+					signOptions: { expiresIn: '1h' },
+				};
+			},
+			inject: [ConfigService],
 		}),
 	],
 	providers: [AuthResolver, AuthService, LocalStrategy, JwtStrategy],
