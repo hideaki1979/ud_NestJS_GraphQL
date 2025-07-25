@@ -15,7 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 		ConfigModule.forRoot(),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
-			useFactory: async (configService: ConfigService) => {
+			useFactory: (configService: ConfigService) => {
 				const secret = configService.get<string>('JWT_SECRET');
 				if (!secret) {
 					throw new Error('JWT_SECRETの環境変数が設定されてません');
