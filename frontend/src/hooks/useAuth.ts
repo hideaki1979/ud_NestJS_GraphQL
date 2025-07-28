@@ -9,23 +9,22 @@ export const useAuth = () => {
     }>({ checked: false, isAuthenticated: false });
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        let isAuthenticated = false;
         try {
+            const token = localStorage.getItem('token');
             if (token) {
                 const decodedToken = jwtDecode<Payload>(token);
-                if (decodedToken.exp * 1000 < Date.now()) {
-                    localStorage.removeItem('token');
-                    setAuthInfo({ checked: true, isAuthenticated: false });
+                if (decodedToken.exp * 1000 > Date.now()) {
+                    isAuthenticated = true;
                 } else {
-                    setAuthInfo({ checked: true, isAuthenticated: true });
+                    localStorage.removeItem('token');
                 }
-            } else {
-                setAuthInfo({ checked: true, isAuthenticated: false });
             }
         } catch (error) {
             setAuthInfo({ checked: true, isAuthenticated: false });
             console.error('認証エラー：', error);
         }
+        setAuthInfo({checked: true, isAuthenticated});
     }, [])
 
     return authInfo;

@@ -10,10 +10,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { ApolloError, useMutation } from '@apollo/client';
 import type { SignInResponse } from '../types/signinResponse';
 import { SIGN_IN } from '../mutations/authMutations';
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 const theme = createTheme();
 
@@ -39,11 +40,16 @@ export default function SignIn() {
             }
 
         } catch (err) {
-            if (err instanceof Error && (err.message === 'Unauthorized' || err.message.includes('401'))) {
-                setFailSignIn(true)
-                return;
+            if (err instanceof ApolloError) {
+                const unAuthorizedError = err.graphQLErrors.find(
+                    (gqlError) => gqlError.extensions?.code === 'UNAUTHENTICATED'
+                );
+                if (unAuthorizedError) {
+                    setFailSignIn(true)
+                    return;
+                }
             }
-            console.log(err)
+            console.error('サインインエラー：', err)
             alert('予期せぬエラーが発生しました');
         }
     };
@@ -103,7 +109,7 @@ export default function SignIn() {
                         </Button>
                         <Grid container>
                             <Grid size="auto">
-                                <Link href="/signup" variant="body2">
+                                <Link component={RouterLink} to="/signup" variant="body2">
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>

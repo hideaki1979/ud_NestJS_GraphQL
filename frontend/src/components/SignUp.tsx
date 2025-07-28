@@ -15,6 +15,7 @@ import type { User } from '../types/user';
 import { SIGN_IN, SIGN_UP } from '../mutations/authMutations';
 import { useNavigate } from 'react-router-dom';
 import type { SignInResponse } from '../types/signinResponse';
+import { Link as RouterLink } from 'react-router-dom';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -34,7 +35,7 @@ export default function SignUp() {
         const signUpInput = { name, email, password };
 
         // フォーム送信前の検証
-        if(!name.trim() || !email.trim() || !password.trim()) {
+        if (!name.trim() || !email.trim() || !password.trim()) {
             setFailSignUp(true);
             return;
         }
@@ -131,7 +132,7 @@ export default function SignUp() {
                         </Button>
                         <Grid container justifyContent="center">
                             <Grid size="auto">
-                                <Link href="/signin" variant="body2">
+                                <Link component={RouterLink} to="/signin" variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>
