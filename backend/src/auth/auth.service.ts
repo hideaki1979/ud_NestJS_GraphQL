@@ -22,7 +22,7 @@ export class AuthService {
 		return null;
 	}
 
-	async signIn(user: User): Promise<SignInResponse> {
+	signIn(user: User): SignInResponse {
 		const payload: JwtPayload = { email: user.email, sub: user.id };
 		return { accessToken: this.jwtService.sign(payload), user };
 	}
