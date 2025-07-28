@@ -1,0 +1,174 @@
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import React, { useState } from 'react';
+import { ApolloError, useMutation } from '@apollo/client';
+import type { Task } from '../types/task';
+import { UPDATE_TASK } from '../mutations/taskMutations';
+import { GET_TASKS } from '../queries/taskQueries';
+import { useNavigate } from 'react-router-dom';
+import { FormControl, IconButton, InputLabel, MenuItem, Select, Tooltip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import type { TaskStatus } from '../types/taskStatus';
+
+export default function EditTask({ task }: { task: Task }) {
+    const [open, setOpen] = useState(false);
+    const [name, setName] = useState(task.name);
+    const [dueDate, setDueDate] = useState(task.dueDate);
+    const [status, setStatus] = useState(task.status);
+    const [description, setDescription] = useState(task.description || '');
+    const [updateTask] = useMutation<{ updateTask: Task }>(UPDATE_TASK);
+    const [isInvalidName, setIsInvalidName] = useState(false);
+    const [isInvalidDueDate, setIsInvalidDueDate] = useState(false);
+    const navigate = useNavigate();
+
+    const resetState = () => {
+        setName(task.name);
+        setDueDate(task.dueDate);
+        setStatus(task.status);
+        setDescription(task.description || '');
+        setIsInvalidName(false);
+        setIsInvalidDueDate(false);
+    }
+
+    // 日付フォーマット変換
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    }
+
+
+    const handleEditTask = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        let canEdit = true;
+        if (name.length === 0) {
+            canEdit = false;
+            setIsInvalidName(true);
+        } else {
+            setIsInvalidName(false);
+        }
+
+        if (!Date.parse(dueDate)) {
+            canEdit = false;
+            setIsInvalidDueDate(true);
+        } else {
+            setIsInvalidDueDate(false);
+        }
+
+        if (canEdit) {
+            const updateTaskInput = { id: task.id, name, dueDate, status, description };
+            try {
+                await updateTask({
+                    variables: { updateTaskInput },
+                    refetchQueries: [{ query: GET_TASKS }]
+                })
+                resetState();
+                setOpen(false);
+            } catch (err) {
+                if (err instanceof ApolloError) {
+                    const graphQLError = err.graphQLErrors.find(
+                        (gqlError) => gqlError.extensions?.code === 'UNAUTHENTICATED'
+                    );
+                    if (graphQLError) {
+                        console.error('タスク編集エラー：', graphQLError.message);
+                        localStorage.removeItem('token');
+                        alert('トークンの有効期限が切れました。サインイン画面に遷移します。');
+                        navigate('/signin');
+                        return;
+                    }
+                }
+                console.error('タスク編集エラー：', err);
+                alert('タスク編集エラーが発生しました');
+                return;
+            }
+        }
+    }
+
+    const handleClickOpen = () => {
+        resetState();
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <Tooltip title='編集'>
+                <IconButton onClick={handleClickOpen}>
+                    <EditIcon color='action' />
+                </IconButton>
+            </Tooltip>
+            <Dialog fullWidth={true} maxWidth='sm' open={open} onClose={handleClose}>
+                <DialogTitle>Edit Task</DialogTitle>
+                <DialogContent sx={{ paddingBottom: 0 }}>
+                    <form onSubmit={handleEditTask}>
+                        <TextField
+                            autoFocus
+                            required
+                            margin="normal"
+                            id="name"
+                            name="name"
+                            label="タスク名"
+                            fullWidth
+                            value={name}
+                            onChange={(e) => { setName(e.target.value) }}
+                            error={isInvalidName}
+                            helperText={isInvalidName && 'タスク名を入力してください'}
+                        />
+                        <TextField
+                            autoFocus
+                            required
+                            margin="normal"
+                            id="dueDate"
+                            name="dueDate"
+                            label="期日"
+                            placeholder='yyyy-mm-dd'
+                            fullWidth
+                            value={formatDate(dueDate)}
+                            onChange={(e) => { setDueDate(e.target.value) }}
+                            error={isInvalidDueDate}
+                            helperText={isInvalidDueDate && '期日は日付形式で入力してください'}
+                        />
+                        <FormControl fullWidth={true} margin='normal'>
+                            <InputLabel id='task-status-label'>ステータス</InputLabel>
+                            <Select
+                                labelId='task-status-label'
+                                id='task-status'
+                                label='Status'
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                            >
+                                <MenuItem value={'NOT_STARTED'}>Not Started</MenuItem>
+                                <MenuItem value={'IN_PROGRESS'}>In Progress</MenuItem>
+                                <MenuItem value={'COMPLETED'}>Completed</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            autoFocus
+                            margin="normal"
+                            id="description"
+                            name="description"
+                            label="説明・補足"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={description}
+                            onChange={(e) => { setDescription(e.target.value) }}
+
+                        />
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button type='submit'>Update</Button>
+                        </DialogActions>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
+}

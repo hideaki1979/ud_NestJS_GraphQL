@@ -4,8 +4,13 @@ export const SIGN_IN = gql`
     mutation signIn($signInInput: SignInInput!) {
         signIn(signInInput: $signInInput) {
             accessToken
+            user {
+                id
+                name
+                email
+            }
         }
-}
+    }
 `
 
 export const SIGN_UP = gql`
@@ -15,5 +20,5 @@ export const SIGN_UP = gql`
             name
             email
         }
-}
+    }
 `

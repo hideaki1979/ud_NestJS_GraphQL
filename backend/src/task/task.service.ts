@@ -19,10 +19,12 @@ export class TaskService {
 	async createTask(createTaskInput: CreateTaskInput): Promise<Task> {
 		const { name, dueDate, description, userId } = createTaskInput;
 		try {
+			// dueDateを適切なDateTime形式に変換(PrismaでISO-8601 DateTime形式のため)
+			const parseDueDate = new Date(dueDate);
 			return await this.prismaService.task.create({
 				data: {
 					name,
-					dueDate,
+					dueDate: parseDueDate,
 					description,
 					userId,
 				},
@@ -45,10 +47,13 @@ export class TaskService {
 			throw new Error('ログイン者でないタスクを更新しようとしています');
 		}
 
+		// dueDateを適切なDateTime形式に変換(PrismaでISO-8601 DateTime形式のため)
+		const parsedDueDate = dueDate ? new Date(dueDate) : undefined;
+
 		return await this.prismaService.task.update({
 			data: {
 				name,
-				dueDate,
+				dueDate: parsedDueDate,
 				status,
 				description,
 			},
