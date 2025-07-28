@@ -12,6 +12,10 @@ import { useNavigate } from "react-router-dom";
 
 const Main = () => {
     const navigate = useNavigate();
+    
+    const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
+        GET_TASKS
+    );
 
     const token = localStorage.getItem('token');
     if(!token) {
@@ -22,9 +26,6 @@ const Main = () => {
     const decodedToken = jwtDecode<Payload>(token);
     const userId = decodedToken.sub;
 
-    const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
-        GET_TASKS
-    );
 
     return (
         <>
