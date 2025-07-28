@@ -21,6 +21,10 @@ export class TaskService {
 		try {
 			// dueDateを適切なDateTime形式に変換(PrismaでISO-8601 DateTime形式のため)
 			const parseDueDate = new Date(dueDate);
+			if (isNaN(parseDueDate.getTime())) {
+				throw new Error('無効な日付データです');
+			}
+
 			return await this.prismaService.task.create({
 				data: {
 					name,
@@ -44,11 +48,14 @@ export class TaskService {
 		});
 
 		if (!existingTask) {
-			throw new Error('ログイン者でないタスクを更新しようとしています');
+			throw new Error('更新対象のタスクのユーザーIDが見つかりませんでした');
 		}
 
 		// dueDateを適切なDateTime形式に変換(PrismaでISO-8601 DateTime形式のため)
 		const parsedDueDate = dueDate ? new Date(dueDate) : undefined;
+		if (parsedDueDate && isNaN(parsedDueDate.getTime())) {
+			throw new Error('無効な日付データです');
+		}
 
 		return await this.prismaService.task.update({
 			data: {

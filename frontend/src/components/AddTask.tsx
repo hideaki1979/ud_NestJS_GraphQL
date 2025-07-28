@@ -32,22 +32,14 @@ export default function AddTask({ userId }: { userId: number }) {
     const handleAddTask = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        let canAdd = true;
-        if (name.length === 0) {
-            canAdd = false;
-            setIsInvalidName(true);
-        } else {
-            setIsInvalidName(false);
-        }
+        const isNameInvalid = name.length === 0
+        setIsInvalidName(isNameInvalid);
 
-        if (!Date.parse(dueDate)) {
-            canAdd = false;
-            setIsInvalidDueDate(true);
-        } else {
-            setIsInvalidDueDate(false);
-        }
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const isDueDateInvalid = !dateRegex.test(dueDate) || !Date.parse(dueDate);
+        setIsInvalidDueDate(isDueDateInvalid)
 
-        if (canAdd) {
+        if (!isNameInvalid && !isDueDateInvalid) {
             const createTaskInput = { name, dueDate, description, userId };
             try {
                 await createTask({
@@ -108,7 +100,6 @@ export default function AddTask({ userId }: { userId: number }) {
                             helperText={isInvalidName && 'タスク名を入力してください'}
                         />
                         <TextField
-                            autoFocus
                             required
                             margin="normal"
                             id="dueDate"
@@ -122,7 +113,6 @@ export default function AddTask({ userId }: { userId: number }) {
                             helperText={isInvalidDueDate && '期日は日付形式で入力してください'}
                         />
                         <TextField
-                            autoFocus
                             margin="normal"
                             id="description"
                             name="description"

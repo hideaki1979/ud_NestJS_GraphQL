@@ -6,23 +6,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import type { Task } from '../types/task';
-import type { ApolloError } from '@apollo/client';
 import EditTask from './EditTask';
+import { formatDate } from '../utils/dateUtils';
 
 interface TaskTableProps {
     tasks: Task[] | undefined;
-    loading?: boolean;
-    error?: ApolloError;
-    userId?: number;
 }
 
 export default function TaskTable({ tasks }: TaskTableProps) {
-
-    // 日付フォーマット変換
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
-    }
 
     return (
         <TableContainer component={Paper} sx={{ width: '80%', m: 'auto' }}>

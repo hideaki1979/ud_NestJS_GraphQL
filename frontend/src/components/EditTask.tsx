@@ -13,6 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { FormControl, IconButton, InputLabel, MenuItem, Select, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import type { TaskStatus } from '../types/taskStatus';
+import { formatDate } from '../utils/dateUtils';
+
+const statusOptions: { value: TaskStatus; label: string }[] = [
+    { value: 'NOT_STARTED', label: 'Not Started' },
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'COMPLETED', label: 'Completed' },
+]
 
 export default function EditTask({ task }: { task: Task }) {
     const [open, setOpen] = useState(false);
@@ -34,32 +41,17 @@ export default function EditTask({ task }: { task: Task }) {
         setIsInvalidDueDate(false);
     }
 
-    // 日付フォーマット変換
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
-    }
-
-
     const handleEditTask = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        let canEdit = true;
-        if (name.length === 0) {
-            canEdit = false;
-            setIsInvalidName(true);
-        } else {
-            setIsInvalidName(false);
-        }
+        const isNameInvalid = name.length === 0
+        setIsInvalidName(isNameInvalid);
 
-        if (!Date.parse(dueDate)) {
-            canEdit = false;
-            setIsInvalidDueDate(true);
-        } else {
-            setIsInvalidDueDate(false);
-        }
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const isDueDateInvalid = !dateRegex.test(dueDate) || !Date.parse(dueDate);
+        setIsInvalidDueDate(isDueDateInvalid)
 
-        if (canEdit) {
+        if (!isNameInvalid && !isDueDateInvalid) {
             const updateTaskInput = { id: task.id, name, dueDate, status, description };
             try {
                 await updateTask({
@@ -122,7 +114,6 @@ export default function EditTask({ task }: { task: Task }) {
                             helperText={isInvalidName && 'タスク名を入力してください'}
                         />
                         <TextField
-                            autoFocus
                             required
                             margin="normal"
                             id="dueDate"
@@ -144,13 +135,14 @@ export default function EditTask({ task }: { task: Task }) {
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
                             >
-                                <MenuItem value={'NOT_STARTED'}>Not Started</MenuItem>
-                                <MenuItem value={'IN_PROGRESS'}>In Progress</MenuItem>
-                                <MenuItem value={'COMPLETED'}>Completed</MenuItem>
+                                {statusOptions.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         <TextField
-                            autoFocus
                             margin="normal"
                             id="description"
                             name="description"

@@ -8,10 +8,18 @@ import { Stack, Typography } from "@mui/material";
 import AddTask from "./AddTask";
 import { jwtDecode } from "jwt-decode";
 import type { Payload } from "../types/payload";
+import { useNavigate } from "react-router-dom";
 
 const Main = () => {
+    const navigate = useNavigate();
+
     const token = localStorage.getItem('token');
-    const decodedToken = jwtDecode<Payload>(token!);
+    if(!token) {
+        console.error('トークンが期限切れのため、ログイン画面に遷移します。');
+        navigate('/signin');
+        return;
+    }
+    const decodedToken = jwtDecode<Payload>(token);
     const userId = decodedToken.sub;
 
     const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
@@ -27,7 +35,7 @@ const Main = () => {
                 {!loading && !error && (
                     <>
                         <AddTask userId={userId} />
-                        <TaskTable tasks={data?.getTasks} loading={loading} error={error} userId={userId} />
+                        <TaskTable tasks={data?.getTasks}/>
                     </>
                 )}
             </Stack>
