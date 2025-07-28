@@ -2,11 +2,22 @@ import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:3100/graphql',
+    uri: import.meta.env.VITE_GRAPHQL_API_URL || 'http://localhost:3100/graphql',
 });
 
 const authLink = setContext((_, prevContext) => {
-    const token = localStorage.getItem('token');
+    let token: string | null = null;
+    try {
+        token = localStorage.getItem('token');
+        // トークンの検証
+        if (token && !token.startsWith('eyJ')) {
+            console.warn('不正なトークンが設定されてます');
+            localStorage.removeItem('token');
+            token = null;
+        }
+    } catch (error) {
+        console.error('localStrageアクセスに失敗：', error);
+    }
     return {
         headers: {
             ...prevContext.headers,

@@ -13,9 +13,9 @@ function App() {
     <ApolloProvider client={client}>
       <Router>
         <Routes>
-          <Route path='/signin' element={<GuestRoute children={<SignIn />} />} />
-          <Route path='/signup' element={<GuestRoute children={<SignUp />} />} />
-          <Route path='/' element={<PrivateRoute children={<Main />} />} />
+          <Route path='/signin' element={<GuestRoute><SignIn /></GuestRoute>} />
+          <Route path='/signup' element={<GuestRoute><SignUp /></GuestRoute>} />
+          <Route path='/' element={<PrivateRoute><Main /></PrivateRoute>} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </Router>

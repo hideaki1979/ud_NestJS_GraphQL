@@ -6,12 +6,19 @@ import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
-
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/signin');
+        if (window.confirm('ログアウトしますか？')) {
+            try {
+                localStorage.removeItem('token');
+                navigate('/signin');
+            } catch (error) {
+                console.error('ログアウト処理中にエラーが発生しました:', error);
+                // エラーが発生してもサイインページに遷移
+                navigate('/signin');
+            }
+        }
     }
 
     return (

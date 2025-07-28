@@ -11,7 +11,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import type { SignInResponse } from '../types/siigninResponse';
+import type { SignInResponse } from '../types/signinResponse';
 import { SIGN_IN } from '../mutations/authMutations';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,24 +35,17 @@ export default function SignIn() {
 
             if (result.data) {
                 localStorage.setItem('token', result.data.signIn.accessToken)
-            }
-
-            if (localStorage.getItem('token')) {
                 navigate('/');
             }
 
         } catch (err) {
-            if (err instanceof Error && err.message === 'Unauthorized') {
+            if (err instanceof Error && (err.message === 'Unauthorized' || err.message.includes('401'))) {
                 setFailSignIn(true)
                 return;
             }
             console.log(err)
             alert('予期せぬエラーが発生しました');
         }
-        console.log({
-            email,
-            password
-        });
     };
 
     return (

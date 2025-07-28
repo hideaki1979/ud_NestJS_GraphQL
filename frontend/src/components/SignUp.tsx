@@ -14,7 +14,7 @@ import { useMutation } from '@apollo/client';
 import type { User } from '../types/user';
 import { SIGN_IN, SIGN_UP } from '../mutations/authMutations';
 import { useNavigate } from 'react-router-dom';
-import type { SignInResponse } from '../types/siigninResponse';
+import type { SignInResponse } from '../types/signinResponse';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -32,6 +32,13 @@ export default function SignUp() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const signUpInput = { name, email, password };
+
+        // フォーム送信前の検証
+        if(!name.trim() || !email.trim() || !password.trim()) {
+            setFailSignUp(true);
+            return;
+        }
+        setFailSignUp(false);
         try {
             const result = await signUp({
                 variables: { createUserInput: signUpInput }
@@ -39,24 +46,18 @@ export default function SignUp() {
 
             if (result.data?.createUser) {
                 const signInInput = { email, password };
-                const result = await signIn({
+                const signInResult = await signIn({
                     variables: { signInInput }
                 });
 
-                if (result.data) {
-                    localStorage.setItem('token', result.data.signIn.accessToken);
+                if (signInResult.data) {
+                    localStorage.setItem('token', signInResult.data.signIn.accessToken);
+                    navigate('/');
                 }
             }
 
-            if (localStorage.getItem('token')) {
-                navigate('/');
-            }
-
         } catch (err) {
-            if (err instanceof Error && err.message === 'Unauthorized') {
-                setFailSignUp(true)
-                return;
-            }
+            console.error('サインアップエラー：', err);
             alert('ユーザー登録に失敗しました');
             return;
 
