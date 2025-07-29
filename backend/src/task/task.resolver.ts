@@ -44,8 +44,9 @@ export class TaskResolver {
 	@UseGuards(JwtAuthGuard)
 	async deleteTask(
 		@Args('id', { type: () => Int }) id: number,
-		@Args('userId', { type: () => Int }) userId: number,
+		@Context() context: GraphQLContext,
 	): Promise<Task> {
-		return await this.taskService.deleteTask(id, userId);
+		const user: User = context.req.user;
+		return await this.taskService.deleteTask(id, user.id);
 	}
 }
