@@ -95,7 +95,9 @@ npm install
 
 ```bash
 # データベース接続
-DATABASE_URL="postgresql://username:password@localhost:5435/taskflow"
+# Database Connection
+# NOTE: POSTGRES_* are used by Docker Compose, and DATABASE_URL is used by Prisma. Ensure the values match.
+DATABASE_URL="postgresql://your_username:your_password@localhost:5435/taskflow"
 POSTGRES_USER=your_username
 POSTGRES_PASSWORD=your_password
 POSTGRES_DB=taskflow
@@ -185,7 +187,7 @@ src/
 │   └── prisma.service.ts   # Prismaサービス
 ├── app.module.ts           # アプリケーションルートモジュール
 ├── main.ts                 # アプリケーションエントリーポイント
-└── schema.qql              # 自動生成GraphQLスキーマ
+└── schema.gql              # 自動生成GraphQLスキーマ
 
 prisma/
 ├── schema.prisma           # Prismaスキーマ定義
