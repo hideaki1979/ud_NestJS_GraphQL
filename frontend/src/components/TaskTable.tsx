@@ -8,6 +8,8 @@ import Paper from '@mui/material/Paper';
 import type { Task } from '../types/task';
 import EditTask from './EditTask';
 import { formatDate } from '../utils/dateUtils';
+import DeleteTask from './DeleteTask';
+import { Stack } from '@mui/material';
 
 interface TaskTableProps {
     tasks: Task[] | undefined;
@@ -37,7 +39,12 @@ export default function TaskTable({ tasks }: TaskTableProps) {
                             </TableCell>
                             <TableCell align="right">{formatDate(task.dueDate)}</TableCell>
                             <TableCell align="right">{task.status}</TableCell>
-                            <TableCell align="right"><EditTask task={task} /></TableCell>
+                            <TableCell align="right">
+                                <Stack spacing={2} direction='row' justifyContent='flex-end' >
+                                    <EditTask task={task} />
+                                    <DeleteTask id={task.id} />
+                                </Stack>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

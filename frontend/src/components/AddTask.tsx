@@ -44,7 +44,12 @@ export default function AddTask({ userId }: { userId: number }) {
             try {
                 await createTask({
                     variables: { createTaskInput },
-                    refetchQueries: [{ query: GET_TASKS }]
+                    // キャッシュ更新方法を改善
+                    refetchQueries: [{
+                        query: GET_TASKS,
+                        fetchPolicy: 'network-only' // 必ずネットワークから取得
+                    }],
+                    awaitRefetchQueries: true
                 })
                 resetState();
                 setOpen(false);
@@ -82,8 +87,16 @@ export default function AddTask({ userId }: { userId: number }) {
             <Button variant="contained" sx={{ width: '280px' }} onClick={handleClickOpen}>
                 Add Task
             </Button>
-            <Dialog fullWidth={true} maxWidth='sm' open={open} onClose={handleClose}>
-                <DialogTitle>Add Task</DialogTitle>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={open}
+                onClose={handleClose}
+                // aria-hiddenエラーを回避するための設定
+                disableRestoreFocus={true}
+                aria-labelledby="add-task-dialog-title"
+            >
+                <DialogTitle id="add-task-dialog-title">Add Task</DialogTitle>
                 <DialogContent sx={{ paddingBottom: 0 }}>
                     <form onSubmit={handleAddTask}>
                         <TextField
