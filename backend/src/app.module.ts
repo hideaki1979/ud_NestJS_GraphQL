@@ -25,7 +25,7 @@ registerEnumType(Status, {
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			driver: ApolloDriver,
 			playground: process.env.NODE_ENV !== 'production',
-			autoSchemaFile: join(process.cwd(), 'src/schema.qql'),
+			autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
 		}),
 		TaskModule,
 		PrismaModule,
