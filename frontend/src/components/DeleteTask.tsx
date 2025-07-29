@@ -6,21 +6,25 @@ import { GET_TASKS } from "../queries/taskQueries";
 import { useNavigate } from "react-router-dom";
 
 const DeleteTask = ({ id }: { id: number }) => {
-    const [deleteTask] = useMutation<{ deleteTask: number }>(DELETE_TASK);
+    const [deleteTask] = useMutation<{ deleteTask: { id: number } }>(DELETE_TASK);
     const navigate = useNavigate();
 
     const handleDeleteTask = async () => {
         try {
-            await deleteTask({
-                variables: { id },
-                // キャッシュ更新方法を改善
-                refetchQueries: [{
-                    query: GET_TASKS,
-                    fetchPolicy: 'network-only' // 必ずネットワークから取得
-                }],
-                awaitRefetchQueries: true
-            })
-            alert('タスクを削除しました。');
+            if (window.confirm('タスクを削除しますか？')) {
+                await deleteTask({
+                    variables: { id },
+                    // キャッシュ更新方法を改善
+                    refetchQueries: [{
+                        query: GET_TASKS,
+                        fetchPolicy: 'network-only' // 必ずネットワークから取得
+                    }],
+                    awaitRefetchQueries: true
+                })
+                alert('タスクを削除しました。');
+            } else {
+                return;
+            }
         } catch (err) {
             if (err instanceof ApolloError) {
                 const graphQLError = err.graphQLErrors.find(
@@ -41,7 +45,7 @@ const DeleteTask = ({ id }: { id: number }) => {
     }
 
     return (
-        <div>
+        <>
             <Tooltip title='削除'>
                 <IconButton
                     onClick={handleDeleteTask}
@@ -51,7 +55,7 @@ const DeleteTask = ({ id }: { id: number }) => {
                     <DeleteIcon color='action' />
                 </IconButton>
             </Tooltip>
-        </div>
+        </>
     )
 }
 

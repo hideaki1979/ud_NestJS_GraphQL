@@ -13,16 +13,6 @@ import { useNavigate } from "react-router-dom";
 const Main = () => {
     const navigate = useNavigate();
 
-    const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
-        GET_TASKS,
-        {
-            // 初期表示時に必ずネットワークから最新データを取得
-            fetchPolicy: 'cache-and-network',
-            // エラー時のポリシー
-            errorPolicy: 'all'
-        }
-    );
-
     const token = localStorage.getItem('token');
     if (!token) {
         console.error('トークンが期限切れのため、ログイン画面に遷移します。');
@@ -32,6 +22,16 @@ const Main = () => {
     const decodedToken = jwtDecode<Payload>(token);
     const userId = decodedToken.sub;
 
+    const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
+        GET_TASKS,
+        {
+            // 初期表示時に必ずネットワークから最新データを取得
+            fetchPolicy: 'cache-and-network',
+            // エラー時のポリシー
+            errorPolicy: 'all',
+            skip: !token
+        }
+    );
 
     return (
         <>

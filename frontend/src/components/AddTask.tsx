@@ -96,7 +96,7 @@ export default function AddTask({ userId }: { userId: number }) {
                 disableRestoreFocus={true}
                 aria-labelledby="add-task-dialog-title"
             >
-                <DialogTitle>Add Task</DialogTitle>
+                <DialogTitle id="add-task-dialog-title">Add Task</DialogTitle>
                 <DialogContent sx={{ paddingBottom: 0 }}>
                     <form onSubmit={handleAddTask}>
                         <TextField

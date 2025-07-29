@@ -114,7 +114,7 @@ export default function EditTask({ task }: { task: Task }) {
                 disableRestoreFocus={true}
                 aria-labelledby="edit-task-dialog-title"
             >
-                <DialogTitle>Edit Task</DialogTitle>
+                <DialogTitle id="edit-task-dialog-title">Edit Task</DialogTitle>
                 <DialogContent sx={{ paddingBottom: 0 }}>
                     <form onSubmit={handleEditTask}>
                         <TextField
