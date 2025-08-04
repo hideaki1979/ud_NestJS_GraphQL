@@ -129,7 +129,7 @@ erDiagram
         int id PK
         string name
         datetime dueDate
-        string status
+        string status "Enum: NOT_STARTED, IN_PROGRESS, COMPLETED"
         string description
         datetime createdAt
         datetime updatedAt
