@@ -231,9 +231,9 @@ graph TD
     F --> F1
     F1 --> F2
 
-    classDef startEndStyle fill:#4ecdc4
+    classDef startEndStyle fill:#4ecdc4,stroke:#000,color:#000
     classDef backendStyle fill:#e0234e
-    classDef frontendStyle fill:#61dafb
+    classDef frontendStyle fill:#61dafb,stroke:#000,color:#000
 
     class A startEndStyle
     class H startEndStyle
@@ -319,7 +319,7 @@ graph LR
     Delete --> Status
 
     classDef jwtStyle fill:#ff6b6b
-    classDef statusStyle fill:#4ecdc4
+    classDef statusStyle fill:#4ecdc4,stroke:#000,color:#000
     classDef materialStyle fill:#007fff
 
     class JWT jwtStyle
