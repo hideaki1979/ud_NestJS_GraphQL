@@ -62,7 +62,7 @@ graph TB
     Queries --> GraphQL
     Mutations --> GraphQL
 
-    style App fill:#61dafb
+    style App fill:#61dafb,stroke:#000,color:#000
     style ApolloClient fill:#e10098
     style GraphQL fill:#e10098
 ```
@@ -124,7 +124,7 @@ graph TB
     GuestRoute --> useAuth
     PrivateRoute --> useAuth
 
-    style ApolloProvider fill:#61dafb
+    style ApolloProvider fill:#61dafb,stroke:#000,color:#000
     style Main fill:#4ecdc4
     style GuestRoute fill:#ff6b6b
     style PrivateRoute fill:#4ecdc4

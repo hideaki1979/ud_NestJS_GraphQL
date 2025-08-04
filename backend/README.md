@@ -50,7 +50,7 @@ graph TB
     Docker --> PostgreSQL
     GraphQL --> Playground
 
-    style UI fill:#61dafb
+    style UI fill:#61dafb,stroke:#000,color:#000
     style GraphQL fill:#e10098
     style PostgreSQL fill:#336791
     style Docker fill:#2496ed

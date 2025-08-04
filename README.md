@@ -47,7 +47,7 @@ graph TB
     GraphQL --> Playground
     React --> Vite
 
-    style React fill:#61dafb
+    style React fill:#61dafb,stroke:#000,color:#000
     style NestJS fill:#e0234e
     style GraphQL fill:#e10098
     style PostgreSQL fill:#336791
@@ -97,7 +97,7 @@ graph LR
     React --> Types
 
     style Backend fill:#e0234e
-    style Frontend fill:#61dafb
+    style Frontend fill:#61dafb,stroke:#000,color:#000
 ```
 
 ### データフロー
@@ -159,7 +159,7 @@ graph TB
     React --> MaterialUI
 
     style NestJS fill:#e0234e
-    style React fill:#61dafb
+    style React fill:#61dafb,stroke:#000,color:#000
     style GraphQL fill:#e10098
     style PostgreSQL fill:#336791
 ```
