@@ -13,6 +13,197 @@ marp: true
 TaskFlow は、モダンな React + TypeScript + GraphQL で構築されたタスク管理アプリケーションのフロントエンドです。
 直感的なユーザーインターフェースで、効率的なタスク管理を実現します。
 
+## 🏗️ システム構成図
+
+### フロントエンドアーキテクチャ
+
+```mermaid
+graph TB
+    subgraph "React Application"
+        App[App.tsx]
+        Router[React Router]
+
+        subgraph "Components"
+            Auth[Auth Components]
+            Task[Task Components]
+            UI[UI Components]
+        end
+
+        subgraph "State Management"
+            ApolloClient[Apollo Client]
+            LocalStorage[Local Storage]
+            AuthHook[useAuth Hook]
+        end
+
+        subgraph "GraphQL Layer"
+            Queries[GraphQL Queries]
+            Mutations[GraphQL Mutations]
+        end
+    end
+
+    subgraph "Backend API"
+        GraphQL[GraphQL Server]
+    end
+
+    App --> Router
+    Router --> Auth
+    Router --> Task
+    Router --> UI
+
+    Auth --> ApolloClient
+    Task --> ApolloClient
+    UI --> ApolloClient
+
+    ApolloClient --> Queries
+    ApolloClient --> Mutations
+    ApolloClient --> LocalStorage
+    ApolloClient --> AuthHook
+
+    Queries --> GraphQL
+    Mutations --> GraphQL
+
+    style App fill:#61dafb
+    style ApolloClient fill:#e10098
+    style GraphQL fill:#e10098
+```
+
+### コンポーネント構成図
+
+```mermaid
+graph TB
+    subgraph "App.tsx"
+        ApolloProvider[ApolloProvider]
+        Router[BrowserRouter]
+    end
+
+    subgraph "Authentication"
+        SignIn[SignIn Component]
+        SignUp[SignUp Component]
+        GuestRoute[GuestRoute Guard]
+        PrivateRoute[PrivateRoute Guard]
+    end
+
+    subgraph "Task Management"
+        Main[Main Component]
+        TaskTable[TaskTable Component]
+        AddTask[AddTask Component]
+        EditTask[EditTask Component]
+        DeleteTask[DeleteTask Component]
+    end
+
+    subgraph "UI Components"
+        Header[Header Component]
+        Loading[Loading Component]
+        NotFound[NotFound Component]
+    end
+
+    subgraph "Custom Hooks"
+        useAuth[useAuth Hook]
+    end
+
+    ApolloProvider --> Router
+        Router --> GuestRoute
+    Router --> PrivateRoute
+    Router --> NotFound
+
+    GuestRoute --> SignIn
+    GuestRoute --> SignUp
+    PrivateRoute --> Main
+
+    Main --> Header
+    Main --> TaskTable
+    Main --> AddTask
+    Main --> EditTask
+    Main --> DeleteTask
+
+    TaskTable --> Loading
+    AddTask --> Loading
+    EditTask --> Loading
+    DeleteTask --> Loading
+
+    GuestRoute --> useAuth
+    PrivateRoute --> useAuth
+
+    style ApolloProvider fill:#61dafb
+    style Main fill:#4ecdc4
+    style GuestRoute fill:#ff6b6b
+    style PrivateRoute fill:#4ecdc4
+```
+
+### データフロー図
+
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant UI as UI Component
+    participant Apollo as Apollo Client
+    participant Auth as Auth Hook
+    participant API as GraphQL API
+    participant Storage as Local Storage
+
+    User->>UI: ログイン操作
+    UI->>Apollo: SIGN_IN mutation
+    Apollo->>API: GraphQL request
+    API-->>Apollo: JWT token + user data
+    Apollo->>Storage: Store JWT token
+    Apollo-->>UI: Authentication success
+    UI->>Auth: Update auth state
+    Auth-->>UI: isAuthenticated = true
+
+    User->>UI: タスク操作
+    UI->>Apollo: GraphQL query/mutation
+    Apollo->>Storage: Get JWT token
+    Apollo->>API: Authenticated request
+    API-->>Apollo: Task data
+    Apollo-->>UI: Updated data
+    UI-->>User: UI update
+```
+
+### ルーティング構成図
+
+```mermaid
+graph LR
+    subgraph "Route Definitions"
+        SignInRoute[Route /signin]
+        SignUpRoute[Route /signup]
+        MainRoute[Route /]
+        NotFoundRoute[Route /*]
+    end
+
+    subgraph "Route Guards"
+        GuestRoute[GuestRoute]
+        PrivateRoute[PrivateRoute]
+    end
+
+    subgraph "Components"
+        SignIn[SignIn Component]
+        SignUp[SignUp Component]
+        Main[Main Component]
+        NotFound[NotFound Component]
+    end
+
+    subgraph "Auth Hook"
+        useAuth[useAuth Hook]
+    end
+
+    SignInRoute --> GuestRoute
+    SignUpRoute --> GuestRoute
+    MainRoute --> PrivateRoute
+    NotFoundRoute --> NotFound
+
+    GuestRoute --> SignIn
+    GuestRoute --> SignUp
+    PrivateRoute --> Main
+
+    GuestRoute --> useAuth
+    PrivateRoute --> useAuth
+
+    style GuestRoute fill:#ff6b6b
+    style PrivateRoute fill:#4ecdc4
+    style Main fill:#4ecdc4
+    style useAuth fill:#f39c12
+```
+
 ## ✨ 機能・機能の説明
 
 ### 🔐 認証機能
@@ -75,9 +266,50 @@ npm install
 
 ### 2. 環境変数設定
 
-バックエンド API のエンドポイントが `http://localhost:3000/graphql` で起動していることを確認してください。
+#### 方法 1: テンプレートファイルを使用
 
-`VITE_GRAPHQL_API_URL="GraphQLのURL"`
+```bash
+# テンプレートファイルをコピー
+cp env.example .env
+
+# .envファイルを編集して実際の値に置き換え
+nano .env
+```
+
+#### 方法 2: 手動で.env ファイルを作成
+
+`.env`ファイルを作成し、以下の環境変数を設定：
+
+```bash
+# ========================================
+# GraphQL API設定
+# ========================================
+
+# GraphQL APIエンドポイント
+# バックエンドAPIのGraphQLエンドポイントURL
+VITE_GRAPHQL_API_URL="http://localhost:3000/graphql"
+
+# ========================================
+# アプリケーション設定
+# ========================================
+
+# アプリケーション環境
+VITE_NODE_ENV=development
+
+# アプリケーションタイトル
+VITE_APP_TITLE="TaskFlow"
+
+# デバッグモード有効化
+VITE_DEBUG_MODE=true
+```
+
+#### 環境変数の説明
+
+| 変数名                 | 必須 | 説明                           | デフォルト値                    |
+| ---------------------- | ---- | ------------------------------ | ------------------------------- |
+| `VITE_GRAPHQL_API_URL` | ✅   | GraphQL API エンドポイント URL | `http://localhost:xxxx/graphql` |
+
+**注意**: Vite では、環境変数は`VITE_`プレフィックスが必要です。
 
 ### 3. 開発サーバー起動
 
@@ -109,31 +341,106 @@ npm run lint
 
 ```
 src/
-├── components/          # Reactコンポーネント
-│   ├── AddTask.tsx     # タスク追加
-│   ├── EditTask.tsx    # タスク編集
-│   ├── DeleteTask.tsx  # タスク削除
-│   ├── TaskTable.tsx   # タスク一覧表示
-│   ├── SignIn.tsx      # ログイン
-│   ├── SignUp.tsx      # ユーザー登録
-│   ├── Header.tsx      # ヘッダーナビゲーション
-│   ├── Main.tsx        # メインページ
-│   ├── Loading.tsx     # ローディングコンポーネント
-│   └── NotFound.tsx    # 404ページ
-├── hooks/              # カスタムフック
-├── mutations/          # GraphQL mutations
-├── queries/            # GraphQL queries
-├── types/              # TypeScript型定義
-├── utils/              # ユーティリティ関数
-├── apolloClient.ts     # Apollo Client設定
-├── AuthRoute.tsx       # 認証ルートガード
-└── App.tsx            # アプリケーションルート
+├── components/              # Reactコンポーネント
+│   ├── AddTask.tsx         # タスク追加フォーム
+│   ├── EditTask.tsx        # タスク編集フォーム
+│   ├── DeleteTask.tsx      # タスク削除確認
+│   ├── TaskTable.tsx       # タスク一覧表示テーブル
+│   ├── SignIn.tsx          # ログインフォーム
+│   ├── SignUp.tsx          # ユーザー登録フォーム
+│   ├── Header.tsx          # ヘッダーナビゲーション
+│   ├── Main.tsx            # メインページ（タスク管理）
+│   ├── Loading.tsx         # ローディングコンポーネント
+│   └── NotFound.tsx        # 404ページ
+├── hooks/                  # カスタムフック
+│   └── useAuth.ts          # 認証状態管理フック
+├── mutations/              # GraphQL mutations
+│   ├── authMutations.ts    # 認証関連mutation
+│   └── taskMutations.ts    # タスク関連mutation
+├── queries/                # GraphQL queries
+│   └── taskQueries.ts      # タスク関連query
+├── types/                  # TypeScript型定義
+│   ├── payload.ts          # JWTペイロード型
+│   ├── signinResponse.ts   # ログイン応答型
+│   ├── task.ts             # タスク型
+│   ├── taskStatus.ts       # タスクステータス型
+│   ├── user.ts             # ユーザー型
+│   └── modern-css-reset.d.ts # CSS型定義
+├── utils/                  # ユーティリティ関数
+│   └── dateUtils.ts        # 日付処理ユーティリティ
+├── apolloClient.ts         # Apollo Client設定
+├── AuthRoute.tsx           # 認証ルートガード
+├── App.tsx                 # アプリケーションルート
+├── App.css                 # アプリケーションスタイル
+├── index.css               # グローバルスタイル
+└── main.tsx               # アプリケーションエントリーポイント
 ```
+
+### ファイル説明
+
+#### コンポーネント
+
+- **認証系**: `SignIn.tsx`, `SignUp.tsx` - ユーザー認証
+- **タスク管理系**: `AddTask.tsx`, `EditTask.tsx`, `DeleteTask.tsx`, `TaskTable.tsx` - タスク CRUD 操作
+- **UI 系**: `Header.tsx`, `Loading.tsx`, `NotFound.tsx` - 共通 UI コンポーネント
+- **ページ系**: `Main.tsx` - メインアプリケーションページ
+
+#### GraphQL 層
+
+- **Queries**: データ取得用 GraphQL クエリ
+- **Mutations**: データ変更用 GraphQL ミューテーション
+- **Apollo Client**: GraphQL クライアント設定と認証連携
+
+#### 型定義
+
+- **認証系**: JWT ペイロード、ログイン応答型
+- **データ系**: タスク、ユーザー、ステータス型
+- **UI 系**: CSS 型定義
 
 ## 🔗 関連リンク
 
 - [バックエンド API](../backend/README.md)
 - [プロジェクト概要](../README.md)
+- [GraphQL Playground](http://localhost:3000/graphql) (開発環境)
+
+## 🚀 開発ガイド
+
+### 開発環境のセットアップ
+
+1. **バックエンドの起動確認**
+
+   ```bash
+   # バックエンドディレクトリで
+   cd ../backend
+   npm run start:dev
+   ```
+
+2. **フロントエンドの起動**
+
+   ```bash
+   # フロントエンドディレクトリで
+   cd frontend
+   npm run dev
+   ```
+
+3. **動作確認**
+   - フロントエンド: http://localhost:5173
+   - バックエンド: http://localhost:3000
+   - GraphQL Playground: http://localhost:3000/graphql
+
+### デバッグ方法
+
+- **ブラウザ開発者ツール**: ネットワークタブで GraphQL リクエストを確認
+- **Apollo Client DevTools**: ブラウザ拡張機能で GraphQL キャッシュを確認
+- **環境変数確認**: `console.log(import.meta.env)` で環境変数を確認
+
+### トラブルシューティング
+
+| 問題               | 解決方法                         |
+| ------------------ | -------------------------------- |
+| GraphQL 接続エラー | バックエンドが起動しているか確認 |
+| 認証エラー         | JWT トークンの有効期限を確認     |
+| ビルドエラー       | TypeScript の型定義を確認        |
 
 ## 📝 ライセンス
 

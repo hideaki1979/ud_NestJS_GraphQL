@@ -14,14 +14,6 @@ const Main = () => {
     const navigate = useNavigate();
 
     const token = localStorage.getItem('token');
-    if (!token) {
-        console.error('トークンが期限切れのため、ログイン画面に遷移します。');
-        navigate('/signin');
-        return;
-    }
-    const decodedToken = jwtDecode<Payload>(token);
-    const userId = decodedToken.sub;
-
     const { loading, data, error } = useQuery<{ getTasks: Task[] }>(
         GET_TASKS,
         {
@@ -32,6 +24,14 @@ const Main = () => {
             skip: !token
         }
     );
+    if (!token) {
+        console.error('トークンが期限切れのため、ログイン画面に遷移します。');
+        navigate('/signin');
+        return;
+    }
+    const decodedToken = jwtDecode<Payload>(token);
+    const userId = decodedToken.sub;
+
 
     return (
         <>

@@ -9,6 +9,171 @@
 TaskFlow Backendは、NestJS + GraphQL + Prismaで構築されたタスク管理アプリケーションのAPIサーバーです。
 型安全なGraphQL APIを提供し、JWT認証によるセキュアなユーザー管理とタスク管理機能を実装しています。
 
+## 🏗️ システム構成図
+
+### 全体システム構成
+
+```mermaid
+graph TB
+    subgraph "Frontend (React + Vite)"
+        UI[React UI Components]
+        ApolloClient[Apollo Client]
+        Router[React Router]
+    end
+
+    subgraph "Backend (NestJS + GraphQL)"
+        GraphQL[Apollo Server]
+        Auth[Auth Module]
+        User[User Module]
+        Task[Task Module]
+        Prisma[Prisma ORM]
+    end
+
+    subgraph "Database"
+        PostgreSQL[(PostgreSQL)]
+    end
+
+    subgraph "Development Tools"
+        Docker[Docker Compose]
+        Playground[GraphQL Playground]
+    end
+
+    UI --> ApolloClient
+    ApolloClient --> GraphQL
+    GraphQL --> Auth
+    GraphQL --> User
+    GraphQL --> Task
+    Task --> Prisma
+    User --> Prisma
+    Auth --> Prisma
+    Prisma --> PostgreSQL
+    Docker --> PostgreSQL
+    GraphQL --> Playground
+
+    style UI fill:#61dafb
+    style GraphQL fill:#e10098
+    style PostgreSQL fill:#336791
+    style Docker fill:#2496ed
+```
+
+### コンポーネント構成図
+
+```mermaid
+graph TB
+    subgraph "NestJS Application"
+        AppModule[App Module]
+
+        subgraph "Auth Module"
+            AuthService[Auth Service]
+            AuthResolver[Auth Resolver]
+            JWTStrategy[JWT Strategy]
+            LocalStrategy[Local Strategy]
+            JWTAuthGuard[JWT Auth Guard]
+        end
+
+        subgraph "User Module"
+            UserService[User Service]
+            UserResolver[User Resolver]
+        end
+
+        subgraph "Task Module"
+            TaskService[Task Service]
+            TaskResolver[Task Resolver]
+        end
+
+        subgraph "Prisma Module"
+            PrismaService[Prisma Service]
+        end
+    end
+
+    subgraph "Database Layer"
+        PrismaClient[Prisma Client]
+        Migrations[Database Migrations]
+    end
+
+    AppModule --> AuthService
+    AppModule --> UserService
+    AppModule --> TaskService
+    AppModule --> PrismaService
+
+    AuthService --> JWTStrategy
+    AuthService --> LocalStrategy
+    AuthResolver --> AuthService
+    UserResolver --> UserService
+    TaskResolver --> TaskService
+
+    PrismaService --> PrismaClient
+    PrismaClient --> Migrations
+
+    style AppModule fill:#e0234e
+    style AuthService fill:#ff6b6b
+    style UserService fill:#4ecdc4
+    style TaskService fill:#45b7d1
+    style PrismaService fill:#2d3748
+```
+
+### ER図（データベース設計）
+
+```mermaid
+erDiagram
+    User {
+        int id PK
+        string name
+        string email UK
+        string password
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Task {
+        int id PK
+        string name
+        datetime dueDate
+        enum status
+        string description
+        datetime createdAt
+        datetime updatedAt
+        int userId FK
+    }
+
+    User ||--o{ Task : "has many"
+
+    %% Status Enum
+    Status {
+        NOT_STARTED
+        IN_PROGRESS
+        COMPLETED
+    }
+```
+
+### 認証フロー図
+
+```mermaid
+sequenceDiagram
+    participant Client as Frontend Client
+    participant Auth as Auth Module
+    participant User as User Service
+    participant DB as Database
+    participant JWT as JWT Service
+
+    Client->>Auth: POST /graphql (signIn)
+    Auth->>User: validateUser(email, password)
+    User->>DB: findUserByEmail(email)
+    DB-->>User: user data
+    User->>Auth: validate password with bcrypt
+    Auth->>JWT: generate JWT token
+    JWT-->>Auth: JWT token
+    Auth-->>Client: SignInResponse with token
+
+    Note over Client: Store JWT token
+
+    Client->>Auth: POST /graphql (with Authorization header)
+    Auth->>Auth: verify JWT token
+    Auth->>DB: execute protected query/mutation
+    DB-->>Auth: result
+    Auth-->>Client: GraphQL response
+```
+
 ## ✨ 機能・機能の説明
 
 ### 🔐 認証機能
@@ -91,23 +256,71 @@ npm install
 
 ### 2. 環境変数設定
 
+#### 方法1: テンプレートファイルを使用
+
+```bash
+# テンプレートファイルをコピー
+cp env.example .env
+
+# .envファイルを編集して実際の値に置き換え
+nano .env
+```
+
+#### 方法2: 手動で.envファイルを作成
+
 `.env`ファイルを作成し、以下の環境変数を設定：
 
 ```bash
-# データベース接続
-# Database Connection
-# NOTE: POSTGRES_* are used by Docker Compose, and DATABASE_URL is used by Prisma. Ensure the values match.
-DATABASE_URL="postgresql://your_username:your_password@localhost:5435/taskflow"
-POSTGRES_USER=your_username
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=taskflow
+# ========================================
+# データベース設定
+# ========================================
 
-# JWT認証
-JWT_SECRET=your_super_secret_jwt_key
+# Prisma用データベース接続URL
+# PostgreSQL接続文字列（Prismaが使用）
+DATABASE_URL="postgresql://taskflow_user:taskflow_password@localhost:5435/taskflow_db"
 
-# アプリケーション
+# Docker Compose用PostgreSQL設定
+# 注意: DATABASE_URLの値と一致させること
+POSTGRES_USER=taskflow_user
+POSTGRES_PASSWORD=taskflow_password
+POSTGRES_DB=taskflow_db
+
+# ========================================
+# 認証・セキュリティ設定
+# ========================================
+
+# JWT認証用シークレットキー
+# 本番環境では強力なランダム文字列を使用すること
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
+
+# bcryptパスワードハッシュ化のストレッチング回数
+# 推奨値: 10-12（セキュリティとパフォーマンスのバランス）
+BCRYPT_SALT_ROUNDS=10
+
+# ========================================
+# アプリケーション設定
+# ========================================
+
+# アプリケーション環境
 NODE_ENV=development
+
+# サーバーポート（デフォルト: 3000）
+PORT=3000
+
+# GraphQL Playground有効化（開発環境のみ）
+GRAPHQL_PLAYGROUND=true
 ```
+
+#### 環境変数の説明
+
+| 変数名               | 必須 | 説明                                    | デフォルト値  |
+| -------------------- | ---- | --------------------------------------- | ------------- |
+| `DATABASE_URL`       | ✅   | Prisma用PostgreSQL接続URL               | -             |
+| `POSTGRES_USER`      | ✅   | PostgreSQLユーザー名                    | -             |
+| `POSTGRES_PASSWORD`  | ✅   | PostgreSQLパスワード                    | -             |
+| `POSTGRES_DB`        | ✅   | PostgreSQLデータベース名                | -             |
+| `JWT_SECRET`         | ✅   | JWT認証用シークレットキー（32文字以上） | -             |
+| `BCRYPT_SALT_ROUNDS` | ✅  | bcryptストレッチング回数                | `10`          |
 
 ### 3. PostgreSQLデータベース起動
 
