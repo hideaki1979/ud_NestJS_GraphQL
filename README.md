@@ -96,8 +96,11 @@ graph LR
     React --> GraphQLClient
     React --> Types
 
-    style Backend fill:#e0234e
-    style Frontend fill:#61dafb,stroke:#000,color:#000
+    classDef nestjsStyle fill:#e0234e
+    classDef reactStyle fill:#61dafb,stroke:#000,color:#000
+
+    class Backend nestjsStyle
+    class Frontend reactStyle
 ```
 
 ### データフロー
@@ -158,10 +161,15 @@ graph TB
     React --> ApolloClient
     React --> MaterialUI
 
-    style NestJS fill:#e0234e
-    style React fill:#61dafb,stroke:#000,color:#000
-    style GraphQL fill:#e10098
-    style PostgreSQL fill:#336791
+    classDef nestjsStyle fill:#e0234e
+    classDef reactStyle fill:#61dafb,stroke:#000,color:#000
+    classDef graphqlStyle fill:#e10098
+    classDef databaseStyle fill:#336791
+
+    class NestJS nestjsStyle
+    class React reactStyle
+    class GraphQL graphqlStyle
+    class PostgreSQL databaseStyle
 ```
 
 ### バックエンド
@@ -223,10 +231,14 @@ graph TD
     F --> F1
     F1 --> F2
 
-    style A fill:#4ecdc4
-    style H fill:#4ecdc4
-    style E fill:#e0234e
-    style G fill:#61dafb
+    classDef startEndStyle fill:#4ecdc4
+    classDef backendStyle fill:#e0234e
+    classDef frontendStyle fill:#61dafb
+
+    class A startEndStyle
+    class H startEndStyle
+    class E backendStyle
+    class G frontendStyle
 ```
 
 ### 詳細セットアップ手順
@@ -306,9 +318,13 @@ graph LR
     Edit --> Status
     Delete --> Status
 
-    style JWT fill:#ff6b6b
-    style Status fill:#4ecdc4
-    style MaterialUI fill:#007fff
+    classDef jwtStyle fill:#ff6b6b
+    classDef statusStyle fill:#4ecdc4
+    classDef materialStyle fill:#007fff
+
+    class JWT jwtStyle
+    class Status statusStyle
+    class MaterialUI materialStyle
 ```
 
 ### 機能詳細
