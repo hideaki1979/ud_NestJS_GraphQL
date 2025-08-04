@@ -260,7 +260,7 @@ npm install
 
 ```bash
 # テンプレートファイルをコピー
-cp env.example .env
+cp .env.example .env
 
 # .envファイルを編集して実際の値に置き換え
 nano .env
@@ -296,20 +296,6 @@ JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
 # bcryptパスワードハッシュ化のストレッチング回数
 # 推奨値: 10-12（セキュリティとパフォーマンスのバランス）
 BCRYPT_SALT_ROUNDS=10
-
-# ========================================
-# アプリケーション設定
-# ========================================
-
-# アプリケーション環境
-NODE_ENV=development
-
-# サーバーポート（デフォルト: 3000）
-PORT=3000
-
-# GraphQL Playground有効化（開発環境のみ）
-GRAPHQL_PLAYGROUND=true
-```
 
 #### 環境変数の説明
 
