@@ -9,7 +9,6 @@ import AddTask from "./AddTask";
 import { jwtDecode } from "jwt-decode";
 import type { Payload } from "../types/payload";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 const Main = () => {
     const navigate = useNavigate();
@@ -25,19 +24,13 @@ const Main = () => {
             skip: !token
         }
     );
-    
-    const userId = (() => {
-        if(!token) return undefined;
-        return jwtDecode<Payload>(token).sub;
-    })
-
-    useEffect(() => {
-        if(!token) {
-            console.error('トークンの有効期限切れのため、ログイン画面に遷移します');
-            navigate('/signin')
-        }
-    }, [token, navigate])
-
+    if (!token) {
+        console.error('トークンが期限切れのため、ログイン画面に遷移します。');
+        navigate('/signin');
+        return;
+    }
+    const decodedToken = jwtDecode<Payload>(token);
+    const userId = decodedToken.sub;
 
 
     return (
