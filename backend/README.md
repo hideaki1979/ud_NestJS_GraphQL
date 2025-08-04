@@ -320,10 +320,7 @@ GRAPHQL_PLAYGROUND=true
 | `POSTGRES_PASSWORD`  | ✅   | PostgreSQLパスワード                    | -             |
 | `POSTGRES_DB`        | ✅   | PostgreSQLデータベース名                | -             |
 | `JWT_SECRET`         | ✅   | JWT認証用シークレットキー（32文字以上） | -             |
-| `BCRYPT_SALT_ROUNDS` | ❌   | bcryptストレッチング回数                | `10`          |
-| `NODE_ENV`           | ❌   | アプリケーション環境                    | `development` |
-| `PORT`               | ❌   | サーバーポート                          | `3000`        |
-| `GRAPHQL_PLAYGROUND` | ❌   | GraphQL Playground有効化                | `true`        |
+| `BCRYPT_SALT_ROUNDS` | ✅  | bcryptストレッチング回数                | `10`          |
 
 ### 3. PostgreSQLデータベース起動
 

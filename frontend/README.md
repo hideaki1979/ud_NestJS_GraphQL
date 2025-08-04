@@ -79,7 +79,8 @@ graph TB
     subgraph "Authentication"
         SignIn[SignIn Component]
         SignUp[SignUp Component]
-        AuthRoute[AuthRoute Guard]
+        GuestRoute[GuestRoute Guard]
+        PrivateRoute[PrivateRoute Guard]
     end
 
     subgraph "Task Management"
@@ -101,12 +102,13 @@ graph TB
     end
 
     ApolloProvider --> Router
-    Router --> AuthRoute
-    Router --> Main
+        Router --> GuestRoute
+    Router --> PrivateRoute
     Router --> NotFound
 
-    AuthRoute --> SignIn
-    AuthRoute --> SignUp
+    GuestRoute --> SignIn
+    GuestRoute --> SignUp
+    PrivateRoute --> Main
 
     Main --> Header
     Main --> TaskTable
@@ -119,12 +121,13 @@ graph TB
     EditTask --> Loading
     DeleteTask --> Loading
 
-    AuthRoute --> useAuth
-    Main --> useAuth
+    GuestRoute --> useAuth
+    PrivateRoute --> useAuth
 
     style ApolloProvider fill:#61dafb
     style Main fill:#4ecdc4
-    style AuthRoute fill:#ff6b6b
+    style GuestRoute fill:#ff6b6b
+    style PrivateRoute fill:#4ecdc4
 ```
 
 ### データフロー図
@@ -160,30 +163,45 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph "Public Routes"
-        SignIn[/signin]
-        SignUp[/signup]
+    subgraph "Route Definitions"
+        SignInRoute[Route /signin]
+        SignUpRoute[Route /signup]
+        MainRoute[Route /]
+        NotFoundRoute[Route /*]
     end
 
-    subgraph "Protected Routes"
-        Main[/]
+    subgraph "Route Guards"
+        GuestRoute[GuestRoute]
+        PrivateRoute[PrivateRoute]
     end
 
-    subgraph "Fallback"
-        NotFound[/*]
+    subgraph "Components"
+        SignIn[SignIn Component]
+        SignUp[SignUp Component]
+        Main[Main Component]
+        NotFound[NotFound Component]
     end
 
-    SignIn --> AuthRoute
-    SignUp --> AuthRoute
-    Main --> PrivateRoute
-    NotFound --> NotFoundComponent
+    subgraph "Auth Hook"
+        useAuth[useAuth Hook]
+    end
 
-    AuthRoute --> GuestRoute
+    SignInRoute --> GuestRoute
+    SignUpRoute --> GuestRoute
+    MainRoute --> PrivateRoute
+    NotFoundRoute --> NotFound
+
+    GuestRoute --> SignIn
+    GuestRoute --> SignUp
+    PrivateRoute --> Main
+
+    GuestRoute --> useAuth
     PrivateRoute --> useAuth
 
-    style SignIn fill:#ff6b6b
+    style GuestRoute fill:#ff6b6b
+    style PrivateRoute fill:#4ecdc4
     style Main fill:#4ecdc4
-    style NotFound fill:#95a5a6
+    style useAuth fill:#f39c12
 ```
 
 ## ✨ 機能・機能の説明
@@ -289,10 +307,7 @@ VITE_DEBUG_MODE=true
 
 | 変数名                 | 必須 | 説明                           | デフォルト値                    |
 | ---------------------- | ---- | ------------------------------ | ------------------------------- |
-| `VITE_GRAPHQL_API_URL` | ✅   | GraphQL API エンドポイント URL | `http://localhost:3100/graphql` |
-| `VITE_NODE_ENV`        | ❌   | アプリケーション環境           | `development`                   |
-| `VITE_APP_TITLE`       | ❌   | アプリケーションタイトル       | `TaskFlow`                      |
-| `VITE_DEBUG_MODE`      | ❌   | デバッグモード有効化           | `true`                          |
+| `VITE_GRAPHQL_API_URL` | ✅   | GraphQL API エンドポイント URL | `http://localhost:xxxx/graphql` |
 
 **注意**: Vite では、環境変数は`VITE_`プレフィックスが必要です。
 
