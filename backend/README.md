@@ -129,7 +129,7 @@ erDiagram
         int id PK
         string name
         datetime dueDate
-        enum status
+        string status
         string description
         datetime createdAt
         datetime updatedAt
@@ -137,13 +137,6 @@ erDiagram
     }
 
     User ||--o{ Task : "has many"
-
-    %% Status Enum
-    Status {
-        NOT_STARTED
-        IN_PROGRESS
-        COMPLETED
-    }
 ```
 
 ### 認証フロー図
@@ -270,7 +263,7 @@ nano .env
 
 `.env`ファイルを作成し、以下の環境変数を設定：
 
-```bash
+````bash
 # ========================================
 # データベース設定
 # ========================================
@@ -316,7 +309,7 @@ docker-compose up -d
 
 # データベースが起動するまで待機
 docker-compose logs postgres
-```
+````
 
 ### 4. データベース初期化
 
