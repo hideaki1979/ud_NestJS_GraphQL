@@ -62,9 +62,12 @@ graph TB
     Queries --> GraphQL
     Mutations --> GraphQL
 
-    style App fill:#61dafb
-    style ApolloClient fill:#e10098
-    style GraphQL fill:#e10098
+    classDef reactStyle fill:#61dafb,stroke:#000,color:#000
+    classDef graphqlStyle fill:#e10098
+
+    class App reactStyle
+    class ApolloClient graphqlStyle
+    class GraphQL graphqlStyle
 ```
 
 ### コンポーネント構成図
@@ -124,10 +127,15 @@ graph TB
     GuestRoute --> useAuth
     PrivateRoute --> useAuth
 
-    style ApolloProvider fill:#61dafb
-    style Main fill:#4ecdc4
-    style GuestRoute fill:#ff6b6b
-    style PrivateRoute fill:#4ecdc4
+    classDef reactStyle fill:#61dafb,stroke:#000,color:#000
+    classDef mainStyle fill:#4ecdc4
+    classDef guestStyle fill:#ff6b6b
+    classDef privateStyle fill:#4ecdc4
+
+    class ApolloProvider reactStyle
+    class Main mainStyle
+    class GuestRoute guestStyle
+    class PrivateRoute privateStyle
 ```
 
 ### データフロー図
@@ -198,10 +206,15 @@ graph LR
     GuestRoute --> useAuth
     PrivateRoute --> useAuth
 
-    style GuestRoute fill:#ff6b6b
-    style PrivateRoute fill:#4ecdc4
-    style Main fill:#4ecdc4
-    style useAuth fill:#f39c12
+    classDef guestStyle fill:#ff6b6b
+    classDef privateStyle fill:#4ecdc4
+    classDef mainStyle fill:#4ecdc4
+    classDef authHookStyle fill:#f39c12
+
+    class GuestRoute guestStyle
+    class PrivateRoute privateStyle
+    class Main mainStyle
+    class useAuth authHookStyle
 ```
 
 ## ✨ 機能・機能の説明

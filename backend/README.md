@@ -50,10 +50,15 @@ graph TB
     Docker --> PostgreSQL
     GraphQL --> Playground
 
-    style UI fill:#61dafb
-    style GraphQL fill:#e10098
-    style PostgreSQL fill:#336791
-    style Docker fill:#2496ed
+    classDef reactStyle fill:#61dafb,stroke:#000,color:#000
+    classDef graphqlStyle fill:#e10098
+    classDef databaseStyle fill:#336791
+    classDef dockerStyle fill:#2496ed
+
+    class UI reactStyle
+    class GraphQL graphqlStyle
+    class PostgreSQL databaseStyle
+    class Docker dockerStyle
 ```
 
 ### コンポーネント構成図
@@ -105,11 +110,17 @@ graph TB
     PrismaService --> PrismaClient
     PrismaClient --> Migrations
 
-    style AppModule fill:#e0234e
-    style AuthService fill:#ff6b6b
-    style UserService fill:#4ecdc4
-    style TaskService fill:#45b7d1
-    style PrismaService fill:#2d3748
+    classDef nestjsStyle fill:#e0234e
+    classDef authStyle fill:#ff6b6b
+    classDef userStyle fill:#4ecdc4
+    classDef taskStyle fill:#45b7d1
+    classDef prismaStyle fill:#2d3748
+
+    class AppModule nestjsStyle
+    class AuthService authStyle
+    class UserService userStyle
+    class TaskService taskStyle
+    class PrismaService prismaStyle
 ```
 
 ### ER図（データベース設計）
