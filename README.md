@@ -243,7 +243,7 @@ graph TD
    ```bash
    cd backend
    npm install
-   cp env.example .env  # 環境変数設定
+   cp .env.example .env  # 環境変数設定
    docker-compose up -d  # PostgreSQL起動
    npx prisma migrate deploy
    npm run start:dev
