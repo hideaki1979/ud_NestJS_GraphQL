@@ -270,7 +270,7 @@ npm install
 
 ```bash
 # テンプレートファイルをコピー
-cp env.example .env
+cp .env.example .env
 
 # .envファイルを編集して実際の値に置き換え
 nano .env
